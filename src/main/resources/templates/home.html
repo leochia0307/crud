@@ -93,6 +93,50 @@
                     </tbody>
 
                 </table>
+
+                <div class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4 rounded-md shadow-sm">
+                    <div class="flex flex-1 justify-between sm:hidden">
+                        <a th:href="@{/(page=${currentPage - 1})}"
+                           th:classappend="${currentPage == 1} ? 'pointer-events-none opacity-50' : ''"
+                           class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">上一頁</a>
+                        <a th:href="@{/(page=${currentPage + 1})}"
+                           th:classappend="${currentPage == totalPages} ? 'pointer-events-none opacity-50' : ''"
+                           class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">下一頁</a>
+                    </div>
+                    <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                顯示第 <span class="font-medium" th:text="${(currentPage - 1) * 5 + 1}">1</span> 到
+                                <span class="font-medium" th:text="${currentPage * 5 > totalItems ? totalItems : currentPage * 5}">5</span> 筆，
+                                共 <span class="font-medium" th:text="${totalItems}">20</span> 筆資料
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="isolate inline-flex -space-x-px rounded-md shadow-xs" aria-label="Pagination">
+                                <a th:href="@{/(page=${currentPage - 1})}"
+                                   th:classappend="${currentPage == 1} ? 'pointer-events-none opacity-50' : ''"
+                                   class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                                    <span class="sr-only">Previous</span>
+                                    &laquo; 上一頁
+                                </a>
+
+                                <span th:each="i : ${#numbers.sequence(1, totalPages > 0 ? totalPages : 1)}">
+                                    <a th:href="@{/(page=${i})}"
+                                       th:text="${i}"
+                                       th:classappend="${currentPage == i} ? 'bg-indigo-600 text-white focus:z-20' : 'text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20'"
+                                       class="relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:outline-offset-0">1</a>
+                                </span>
+
+                                <a th:href="@{/(page=${currentPage + 1})}"
+                                   th:classappend="${currentPage == totalPages} ? 'pointer-events-none opacity-50' : ''"
+                                   class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                                    <span class="sr-only">Next</span>
+                                    下一頁 &raquo;
+                                </a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>

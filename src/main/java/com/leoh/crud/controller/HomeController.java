@@ -3,6 +3,7 @@ package com.leoh.crud.controller;
 import com.leoh.crud.model.Customer;
 import com.leoh.crud.service.CustomerService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -84,11 +85,22 @@ public class HomeController {
     }
 
     // 首頁
+    // 修改首頁：加入分頁參數，預設每頁 5 筆
     @GetMapping("/")
-    public String home(@RequestParam(value = "name", defaultValue = "") String name,
+    public String home(@RequestParam(value = "page", defaultValue = "1") int page,
                        Model model) {
-        List<Customer> allCustomers = customerService.getAllCustomers();
-        model.addAttribute("allCustomers", allCustomers);
+
+        int pageSize = 5; // 限制一次最多顯示 5 筆
+
+        // 取得分頁資料
+        Page<Customer> customerPage = customerService.getCustomersPage(page, pageSize);
+
+        // 傳遞到前端模板
+        model.addAttribute("allCustomers", customerPage.getContent()); // 當前頁面的客戶清單
+        model.addAttribute("currentPage", page);                       // 當前頁碼
+        model.addAttribute("totalPages", customerPage.getTotalPages());   // 總頁數
+        model.addAttribute("totalItems", customerPage.getTotalElements()); // 總筆數
+
         return "home";
     }
 
