@@ -1,5 +1,5 @@
 <!DOCTYPE html >
-<html lang="en" class="h-full bg-gray-100" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" class="h-full bg-gray-100" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>首頁</title>
@@ -14,15 +14,22 @@
                         <div class="shrink-0">
                             <img src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" class="size-8" />
                         </div>
-                        <div class="hidden md:block">
-                            <div class="ml-10 flex items-baseline space-x-4">
-                                <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-white/5 hover:text-white" -->
-                                <a th:href="@{/}" aria-current="page" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white">重新整理</a>
-                            </div>
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a th:href="@{/}" aria-current="page" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white">重新整理</a>
                         </div>
+                    </div>
+                    <div class="flex items-center space-x-4 text-white">
+                <span class="text-sm">
+                    歡迎，<span sec:authentication="name" class="font-bold text-indigo-400"></span>
+                    (<span sec:authentication="principal.authorities" class="text-xs text-gray-400"></span>)
+                </span>
+                        <form th:action="@{/logout}" method="POST">
+                            <button type="submit" class="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded text-sm font-medium text-white">登出</button>
+                        </form>
                     </div>
                 </div>
             </div>
+        </nav>
 
 
         </nav>
@@ -75,7 +82,8 @@
                                     編輯
                                 </a>
 
-                                <a th:href="@{/customer/{id}/delete(id=${customer.id})}"
+                                <a sec:authorize="hasRole('ADMIN')"
+                                   th:href="@{/customer/{id}/delete(id=${customer.id})}"
                                    class="bg-red-600 font-medium hover:bg-red-700 px-3 py-2 rounded-md text-sm text-white mr-1">
                                     刪除
                                 </a>
