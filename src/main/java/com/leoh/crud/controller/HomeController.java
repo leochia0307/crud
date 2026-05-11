@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Optional;
 
 // https://www.youtube.com/watch?v=C12_XykFevQ
 @Controller
@@ -23,29 +24,42 @@ public class HomeController {
     }
 
     // 新增
-    // 連結到新增表單
+    // 1. 新增：顯示新增表單（剛才漏掉的這個）
     @GetMapping("/create")
-    public String create(Model model) {
-        Customer customer = new Customer();
-        model.addAttribute("customer", customer);
+    public String showCreateForm(Model model) {
+        model.addAttribute("customer", new Customer());
         return "create";
     }
-
-    // 表單資料填寫完成後，儲存資料，回到首頁
+    // 連結到新增表單
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute("customer") Customer customer,
                        BindingResult bindingResult,
                        RedirectAttributes redirectAttributes,
                        Model model) {
 
+        // 1. 基本欄位驗證（如名稱未填、格式不對等）
         if (bindingResult.hasErrors()) {
-            return "/create";
+            return "create"; // 注意：這裡原本是 "/create"，有些環境會找不到，改成 "create" 更安全
         }
 
+        // 2. 檢查 Email 是否重複
+        Optional<Customer> existingCustomer = customerService.findByEmail(customer.getEmail());
+
+        if (existingCustomer.isPresent()) {
+            // 如果是「新增」(id 為 null)，或是「修改」時該 Email 被「別的客戶」使用了
+            if (customer.getId() == null || !existingCustomer.get().getId().equals(customer.getId())) {
+
+                // 手動向 BindingResult 注入錯誤訊息，這樣 Thymeleaf 就能在 email 欄位下方顯示錯誤
+                bindingResult.rejectValue("email", "error.customer", "此電子信箱已被其他客戶使用！");
+                return "create";
+            }
+        }
+
+        // 3. 儲存並轉址
         customerService.save(customer);
         redirectAttributes.addFlashAttribute(
                 "message",
-                "新增資料成功"
+                customer.getId() == null ? "新增資料成功" : "修改資料成功"
         );
         return "redirect:/";
     }

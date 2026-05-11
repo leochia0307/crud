@@ -24,6 +24,11 @@ public class CustomerService {
         return customerRepository.findById(id);
     }
 
+    // 新增：透過 Email 尋找客戶
+    public Optional<Customer> findByEmail(String email) {
+        return customerRepository.findByEmail(email);
+    }
+
     public Customer save(Customer customer) {
         return customerRepository.save(customer);
     }
