@@ -3,6 +3,7 @@ package com.leoh.crud.controller;
 import com.leoh.crud.model.Customer;
 import com.leoh.crud.service.CustomerService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -84,11 +85,24 @@ public class HomeController {
     }
 
     // 首頁
+    // 修改首頁：整合分頁與關鍵字搜尋
     @GetMapping("/")
-    public String home(@RequestParam(value = "name", defaultValue = "") String name,
+    public String home(@RequestParam(value = "page", defaultValue = "1") int page,
+                       @RequestParam(value = "keyword", required = false) String keyword,
                        Model model) {
-        List<Customer> allCustomers = customerService.getAllCustomers();
-        model.addAttribute("allCustomers", allCustomers);
+
+        int pageSize = 5; // 每頁 5 筆
+
+        // 取得分頁與搜尋資料
+        Page<Customer> customerPage = customerService.getCustomersPage(keyword, page, pageSize);
+
+        // 傳遞到前端模板
+        model.addAttribute("allCustomers", customerPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", customerPage.getTotalPages());
+        model.addAttribute("totalItems", customerPage.getTotalElements());
+        model.addAttribute("keyword", keyword); // 傳回關鍵字，讓前端輸入框與分頁連結可以使用
+
         return "home";
     }
 
