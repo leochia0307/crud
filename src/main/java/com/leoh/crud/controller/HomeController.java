@@ -56,11 +56,15 @@ public class HomeController {
             }
         }
 
+        // 在 save 之前，先記錄這是不是一筆「全新」的新增資料
+        boolean isNewCustomer = (customer.getId() == null);
+
         // 3. 儲存並轉址
         customerService.save(customer);
+        // 根據剛才儲存前的紀錄（isNewCustomer）來決定提示訊息
         redirectAttributes.addFlashAttribute(
                 "message",
-                customer.getId() == null ? "新增資料成功" : "修改資料成功"
+                isNewCustomer ? "新增資料成功" : "修改資料成功"
         );
         return "redirect:/";
     }
